@@ -9,7 +9,9 @@ let myRoom = "";
 
 // --- Socket Events ---
 
-socket.on('connect', () => { myId = socket.id; });
+socket.on('connect', () => {
+    myId = socket.id;
+});
 
 socket.on('roomUpdate', (room) => {
     gameState = room;
@@ -25,22 +27,30 @@ socket.on('gameStarted', (room) => {
 });
 
 socket.on('roundOver', (data) => {
+    // Reveal dice
     gameState.players = data.allPlayers; 
     gameState.gameActive = false;
     gameState.currentBid = null;
+    
     notify(data.message);
     updateUI();
     drawGame();
 });
 
-socket.on('notification', (msg) => { notify(msg); });
+socket.on('notification', (msg) => {
+    notify(msg);
+});
 
 // --- UI Logic ---
 
 function joinGame() {
     myUsername = document.getElementById('username').value;
     myRoom = document.getElementById('roomName').value;
-    if(!myUsername || !myRoom) return alert("Enter details");
+    
+    if(!myUsername || !myRoom) {
+        alert("Please enter a nickname and a room name.");
+        return;
+    }
 
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('game-container').classList.remove('hidden');
@@ -49,7 +59,9 @@ function joinGame() {
     socket.emit('joinRoom', { username: myUsername, room: myRoom });
 }
 
-function startGame() { socket.emit('startGame', myRoom); }
+function startGame() {
+    socket.emit('startGame', myRoom);
+}
 
 function placeBid() {
     const qty = parseInt(document.getElementById('bidQty').value);
@@ -57,11 +69,14 @@ function placeBid() {
     socket.emit('placeBid', { room: myRoom, quantity: qty, face: face });
 }
 
-function callLiar() { socket.emit('callLiar', myRoom); }
+function callLiar() {
+    socket.emit('callLiar', myRoom);
+}
 
 function notify(msg) {
     const el = document.getElementById('notification-area');
     el.innerText = msg;
+    // Clear message after 5 seconds
     setTimeout(() => { el.innerText = ""; }, 5000);
 }
 
@@ -77,7 +92,7 @@ function updateUI() {
         // Game Not Running
         startBtn.classList.remove('hidden');
         controls.classList.add('hidden');
-        turnBar.innerText = "Waiting for game to start...";
+        turnBar.innerText = "Waiting for start...";
         turnBar.className = "turn-waiting";
     } else {
         // Game Running
@@ -88,7 +103,7 @@ function updateUI() {
 
         if (isMyTurn) {
             controls.classList.remove('hidden');
-            liarBtn.disabled = !gameState.currentBid; 
+            liarBtn.disabled = !gameState.currentBid; // Can't call liar on very first move
             
             // UPDATE TEXT BAR FOR ME
             turnBar.innerText = "IT'S YOUR TURN!";
@@ -103,54 +118,60 @@ function updateUI() {
     }
 }
 
-// --- CANVAS DRAWING ---
+// --- CANVAS DRAWING LOGIC ---
 
 function drawGame() {
+    // 1. Clear Screen
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     if (!gameState) return;
 
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
     const tableRadius = 220;
 
-    // Center Info
+    // 2. Draw Table Center Info
     ctx.textAlign = "center";
     if (gameState.currentBid) {
         ctx.fillStyle = "#f1c40f";
         ctx.font = "bold 40px Arial";
-        ctx.fillText(`${gameState.currentBid.quantity} x `, cx - 20, cy);
+        ctx.fillText(`${gameState.currentBid.quantity} x `, cx - 25, cy);
         drawDieFace(cx + 30, cy - 20, 40, gameState.currentBid.face);
+        
         ctx.font = "16px Arial";
         ctx.fillStyle = "#ddd";
         ctx.fillText(`(Current Bid)`, cx, cy + 40);
     } else if (gameState.gameActive) {
-        ctx.fillStyle = "white"; ctx.font = "20px Arial";
+        ctx.fillStyle = "white";
+        ctx.font = "20px Arial";
         ctx.fillText("Waiting for first bid...", cx, cy);
     }
 
-    // Players
+    // 3. Draw Players
     const totalPlayers = gameState.players.length;
+    
     gameState.players.forEach((player, i) => {
         const angle = (Math.PI * 2 / totalPlayers) * i;
         const px = cx + Math.cos(angle) * tableRadius;
         const py = cy + Math.sin(angle) * tableRadius;
+
         drawPlayer(player, px, py, i === gameState.currentTurnIndex);
     });
 }
 
 function drawPlayer(player, x, y, isTurn) {
-    // 1. Draw Active Player Glow/Indicator
+    // Draw Active Player Glow
     if (isTurn && gameState.gameActive) {
         ctx.beginPath();
         ctx.arc(x, y, 45, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(241, 196, 15, 0.3)"; // Yellow glow
+        ctx.fillStyle = "rgba(241, 196, 15, 0.3)";
         ctx.fill();
         ctx.lineWidth = 4;
         ctx.strokeStyle = "#f1c40f";
         ctx.stroke();
     }
 
-    // 2. Avatar Circle
+    // Avatar Circle
     ctx.beginPath();
     ctx.arc(x, y, 30, 0, Math.PI * 2);
     ctx.fillStyle = (player.id === myId) ? "#2980b9" : "#444";
@@ -158,21 +179,22 @@ function drawPlayer(player, x, y, isTurn) {
     ctx.lineWidth = 2;
     ctx.strokeStyle = "#fff";
     ctx.stroke();
+    ctx.closePath();
 
-    // 3. Name
+    // Name
     ctx.fillStyle = "white";
     ctx.font = isTurn ? "bold 18px Arial" : "16px Arial";
     ctx.textAlign = "center";
     ctx.fillText(player.username, x, y + 55);
 
-    // 4. Turn Text on Canvas
+    // Thinking Text
     if (isTurn && gameState.gameActive) {
         ctx.fillStyle = "#f1c40f";
         ctx.font = "bold 12px Arial";
         ctx.fillText("THINKING...", x, y - 40);
     }
 
-    // 5. Dice
+    // Dice Container
     const showValues = (player.id === myId) || (!gameState.gameActive);
     const diceSize = 25;
     const gap = 5;
@@ -183,7 +205,9 @@ function drawPlayer(player, x, y, isTurn) {
     if (player.diceCount > 0) {
         for(let i=0; i<player.diceCount; i++) {
             let val = 0; 
-            if (showValues && player.dice[i]) val = player.dice[i];
+            if (showValues && player.dice[i]) {
+                val = player.dice[i];
+            }
             drawDieFace(startX + (i * (diceSize + gap)), startY, diceSize, val);
         }
     } else {
@@ -198,26 +222,32 @@ function drawDieFace(x, y, size, val) {
     ctx.strokeStyle = "#333";
     ctx.lineWidth = 1;
 
-    // Draw Rounded Square
+    // Draw Rounded Square (manual fallback)
     ctx.beginPath();
-    ctx.roundRect(x, y, size, size, 4);
+    if (ctx.roundRect) {
+        ctx.roundRect(x, y, size, size, 4);
+    } else {
+        ctx.rect(x, y, size, size); // Old browser fallback
+    }
     ctx.fill();
     ctx.stroke();
 
+    // Draw Question Mark if hidden
     if (val === 0) {
         ctx.fillStyle = "#bdc3c7";
         ctx.font = `bold ${size/1.5}px Arial`;
-        ctx.textAlign = "center"; 
+        ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("?", x + size/2, y + size/2 + 2);
         return;
     }
 
-    // Dots
+    // Draw Pips (Dots)
     ctx.fillStyle = "black";
     const dotSize = size / 5;
-    const c = size / 2; 
-    const q = size / 4; 
+    const c = size / 2; // center
+    const q = size / 4; // quarter
+
     const dot = (dx, dy) => {
         ctx.beginPath();
         ctx.arc(x + dx, y + dy, dotSize/2, 0, Math.PI*2);
@@ -229,10 +259,3 @@ function drawDieFace(x, y, size, val) {
     if (val > 3) { dot(size-q, q); dot(q, size-q); }
     if (val === 6) { dot(q, c); dot(size-q, c); }
 }
-
-if (!CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-        if (w < 2 * r) r = w / 2;
-        if (h < 2 * r) r = h / 2;
-        this.beginPath(); this.moveTo(x + r, y);
-        this.arcTo(x + w, y, x + w, y + h,
