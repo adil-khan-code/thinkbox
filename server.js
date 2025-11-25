@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
 
         const allReady = room.players.every(p => p.isReady);
         if (room.players.length > 1 && allReady) {
-            room.gameInProgress = true; // The match has officially started
+            room.gameInProgress = true;
             startGameLogic(room, roomName);
         } else {
             io.to(roomName).emit('roomUpdate', room);
@@ -58,7 +58,6 @@ io.on('connection', (socket) => {
                 p.dice.sort((a,b) => a-b);
             }
         });
-        // Ensure starting player has dice
         if (room.players[room.currentTurnIndex].diceCount === 0) {
              do {
                 room.currentTurnIndex = (room.currentTurnIndex + 1) % room.players.length;
@@ -88,25 +87,27 @@ io.on('connection', (socket) => {
         const count = allDice.filter(d => d === targetFace || d === 1).length;
         const bidWasTrue = count >= r.currentBid.quantity;
         
+        // The "winner" of the challenge (who was correct) loses a die.
         const winnerIndex = bidWasTrue ? r.players.findIndex(p => p.id === r.currentBid.player) : r.currentTurnIndex;
-        const loser = r.players[winnerIndex]; // The winner of the challenge loses a die
-        if (loser) loser.diceCount--;
+        const playerLosingDie = r.players[winnerIndex];
+        if (playerLosingDie) playerLosingDie.diceCount--;
 
         io.to(roomName).emit('roundOver', {
             allPlayers: r.players,
-            message: `There were ${count} × ${targetFace}s. ${loser.username} loses a die!`
+            message: `There were ${count} × ${targetFace}s. ${playerLosingDie.username} loses a die!`
         });
         
-        // Check for Game Over condition
-        const playersWithDice = r.players.filter(p => p.diceCount > 0);
-        if (playersWithDice.length <= 1) {
-            const winner = playersWithDice[0];
-            io.to(roomName).emit('gameOver', { winner: winner ? winner.username : "Nobody" });
+        // --- NEW WIN CONDITION CHECK ---
+        // Check if the player who just lost a die now has zero.
+        if (playerLosingDie && playerLosingDie.diceCount === 0) {
+            // This player is the first to lose all their dice. They WIN!
+            io.to(roomName).emit('gameOver', { winner: playerLosingDie.username });
             resetRoom(r);
+            // After a delay, send the lobby update
             setTimeout(() => io.to(roomName).emit('roomUpdate', r), NEXT_ROUND_DELAY);
         } else {
-            // Start next round automatically after a delay
-            r.currentTurnIndex = winnerIndex;
+            // Game is not over, start the next round automatically after a delay
+            r.currentTurnIndex = winnerIndex; // The player who lost the die starts the next round.
             setTimeout(() => startGameLogic(r, roomName), NEXT_ROUND_DELAY);
         }
     });
