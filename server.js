@@ -7,7 +7,7 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = {};
-const NEXT_ROUND_DELAY = 4000; // 4 seconds
+const NEXT_ROUND_DELAY = 5000; // 5 seconds to read the complex result
 
 function resetRoom(room) {
     room.gameInProgress = false;
@@ -80,34 +80,67 @@ io.on('connection', (socket) => {
     socket.on('callLiar', (roomName) => {
         const r = rooms[roomName];
         if (!r || !r.currentBid) return;
-        r.gameActive = false; // Stop bids during reveal
+        r.gameActive = false;
 
         const allDice = r.players.flatMap(p => p.dice);
         const targetFace = r.currentBid.face;
         const count = allDice.filter(d => d === targetFace || d === 1).length;
         const bidWasTrue = count >= r.currentBid.quantity;
         
-        // The "winner" of the challenge (who was correct) loses a die.
-        const winnerIndex = bidWasTrue ? r.players.findIndex(p => p.id === r.currentBid.player) : r.currentTurnIndex;
-        const playerLosingDie = r.players[winnerIndex];
-        if (playerLosingDie) playerLosingDie.diceCount--;
+        let safePlayerId;
+        let roundLosers = [];
+        let message;
+        let nextTurnPlayerIndex;
+
+        const challengerIndex = r.currentTurnIndex;
+        const bidderIndex = r.players.findIndex(p => p.id === r.currentBid.player);
+        const challenger = r.players[challengerIndex];
+        const bidder = r.players[bidderIndex];
+
+        if (bidWasTrue) {
+            // The bid was TRUE. The challenger was WRONG.
+            // The challenger is the only one who doesn't lose a die.
+            safePlayerId = challenger.id;
+            nextTurnPlayerIndex = challengerIndex;
+            message = `${bidder.username}'s bid was TRUE! Everyone except ${challenger.username} loses a die!`;
+        } else {
+            // The bid was FALSE. The challenger was RIGHT.
+            // The bidder (the liar) is the only one who doesn't lose a die.
+            safePlayerId = bidder.id;
+            nextTurnPlayerIndex = bidderIndex;
+            message = `${bidder.username} was LYING! Everyone except ${bidder.username} loses a die!`;
+        }
+
+        // Apply penalty to everyone except the safe player
+        r.players.forEach(p => {
+            if (p.id !== safePlayerId && p.diceCount > 0) {
+                p.diceCount--;
+                roundLosers.push(p); // Track players who lost a die
+            }
+        });
 
         io.to(roomName).emit('roundOver', {
             allPlayers: r.players,
-            message: `There were ${count} × ${targetFace}s. ${playerLosingDie.username} loses a die!`
+            message: message
         });
+
+        // Check for a winner from the list of players who just lost a die
+        let winner = null;
+        for (const p of roundLosers) {
+            if (p.diceCount === 0) {
+                winner = p;
+                break; // We have a winner!
+            }
+        }
         
-        // --- NEW WIN CONDITION CHECK ---
-        // Check if the player who just lost a die now has zero.
-        if (playerLosingDie && playerLosingDie.diceCount === 0) {
-            // This player is the first to lose all their dice. They WIN!
-            io.to(roomName).emit('gameOver', { winner: playerLosingDie.username });
+        if (winner) {
+            // Game Over
+            io.to(roomName).emit('gameOver', { winner: winner.username });
             resetRoom(r);
-            // After a delay, send the lobby update
             setTimeout(() => io.to(roomName).emit('roomUpdate', r), NEXT_ROUND_DELAY);
         } else {
-            // Game is not over, start the next round automatically after a delay
-            r.currentTurnIndex = winnerIndex; // The player who lost the die starts the next round.
+            // Not over, start next round
+            r.currentTurnIndex = nextTurnPlayerIndex;
             setTimeout(() => startGameLogic(r, roomName), NEXT_ROUND_DELAY);
         }
     });
