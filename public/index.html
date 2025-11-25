@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snyd - Canvas Edition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <h1>Snyd (Canvas)</h1>
+        <input type="text" id="username" placeholder="Nickname">
+        <input type="text" id="roomName" placeholder="Room Name">
+        <button onclick="joinGame()">Join Table</button>
+    </div>
+
+    <!-- GAME CONTAINER -->
+    <div id="game-container" class="hidden">
+        <!-- The Graphics Layer -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- The UI Overlay Layer -->
+        <div id="ui-layer">
+            <div id="top-info">Room: <span id="dispRoom"></span></div>
+            
+            <div id="controls-area" class="hidden">
+                <div class="control-box">
+                    <h3>Place Bid</h3>
+                    <input type="number" id="bidQty" min="1" value="1" style="width:50px"> 
+                    <span>x</span>
+                    <select id="bidFace">
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                    <br><br>
+                    <button class="btn-green" onclick="placeBid()">Bid</button>
+                    <button class="btn-red" id="btnLiar" onclick="callLiar()">Call Liar!</button>
+                </div>
+            </div>
+
+            <button id="start-btn" class="hidden btn-blue" onclick="startGame()">Start Game</button>
+            <div id="notification-area">Waiting for players...</div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
