@@ -8,7 +8,6 @@
 </head>
 <body>
 
-    <!-- Login Screen -->
     <div id="login-screen">
         <h1>Snyd Multiplayer</h1>
         <div class="login-box">
@@ -18,31 +17,26 @@
         </div>
     </div>
 
-    <!-- Game Screen -->
     <div id="game-container" class="hidden">
-        
-        <!-- The Graphics -->
         <canvas id="gameCanvas" width="800" height="600"></canvas>
         
-        <!-- The UI Overlay -->
         <div id="ui-layer">
             
-            <!-- Top Status Bar -->
-            <div id="turn-bar" class="turn-waiting">Waiting for game start...</div>
+            <div id="turn-bar" class="turn-waiting">Waiting...</div>
             <div id="room-info">Room: <span id="dispRoom"></span></div>
 
-            <!-- Start Button -->
-            <button id="start-btn" class="hidden btn-blue" onclick="startGame()">Start Game</button>
+            <!-- NEW: Ready Button Area -->
+            <div id="ready-area" class="hidden">
+                <div class="ready-status" id="ready-status-text">Waiting for players...</div>
+                <button id="btn-ready" onclick="toggleReady()">I'M READY</button>
+            </div>
             
-            <!-- Notification Popup -->
             <div id="notification-area"></div>
 
-            <!-- Apple-Style Bid Controls (Only visible when it's your turn) -->
             <div id="controls-area" class="hidden">
                 <div id="bid-panel">
                     <div class="panel-header">Make your bid</div>
                     
-                    <!-- Quantity Stepper -->
                     <div class="bid-row">
                         <span class="label">Quantity</span>
                         <div class="stepper">
@@ -52,15 +46,11 @@
                         </div>
                     </div>
 
-                    <!-- Dice Face Selector -->
                     <div class="bid-row">
                         <span class="label">Dice Face</span>
-                        <div id="dice-selector">
-                            <!-- Injected by JS -->
-                        </div>
+                        <div id="dice-selector"></div>
                     </div>
 
-                    <!-- Actions -->
                     <div class="action-row">
                         <button id="btn-place-bid" onclick="submitBid()">Place Bid</button>
                         <button id="btn-liar" onclick="callLiar()">Call Liar!</button>
