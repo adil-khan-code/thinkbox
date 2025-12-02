@@ -8,8 +8,8 @@ body {
 .login-box input { display: block; margin: 10px auto; padding: 12px; width: 200px; border-radius: 10px; border: none; background: #3a3a3c; color: white; font-size: 16px; }
 .btn-primary { background: #0a84ff; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: 600; }
 
-#game-container { position: relative; width: 800px; height: 600px; box-shadow: 0 0 50px rgba(0,0,0,0.8); border-radius: 20px; }
-canvas { background-color: #27ae60; border-radius: 20px; border: 12px solid #5d4037; display: block; }
+#game-container { position: relative; width: 1040px; height: 780px; box-shadow: 0 0 50px rgba(0,0,0,0.8); border-radius: 20px; }
+canvas { width: 1040px; height: 780px; background-color: #27ae60; border-radius: 20px; border: 12px solid #5d4037; display: block; }
 #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 
 #turn-bar {
@@ -40,7 +40,7 @@ canvas { background-color: #27ae60; border-radius: 20px; border: 12px solid #5d4
 .bid-value span { font-size: 16px; color: #8e8e93; }
 
 #my-hand-display { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
-.large-die { width: 40px; height: 40px; background: #fff; border: 2px solid #333; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; }
+.large-die { width: 52px; height: 52px; background: #fff; border: 2px solid #333; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 31px; font-weight: bold; }
 
 .bid-row { margin-bottom: 15px; }
 .stepper { display: flex; justify-content: center; align-items: center; background: #e5e5ea; border-radius: 14px; padding: 4px; width: fit-content; margin: 0 auto; }
