@@ -12,13 +12,6 @@
         <div class="login-box">
             <input type="text" id="username" placeholder="Your Nickname">
             <input type="text" id="roomName" placeholder="Room Name">
-
-            <!-- Role selector -->
-            <div class="role-selector">
-                <label><input type="radio" name="role" value="player" checked> Player</label>
-                <label><input type="radio" name="role" value="spectator"> Spectator</label>
-            </div>
-
             <button class="btn-primary" onclick="joinGame()">Join Table</button>
         </div>
     </div>
@@ -28,15 +21,11 @@
         <div id="ui-layer">
             <div id="turn-bar" class="turn-waiting">Waiting...</div>
             <div id="room-info">Room: <span id="dispRoom"></span></div>
-            <div id="spectators-display">Audience: None</div>
-
             <div id="ready-area" class="hidden">
                 <div class="ready-status" id="ready-status-text"></div>
                 <button id="btn-ready" onclick="toggleReady()">I'M READY</button>
             </div>
-
             <div id="notification-area"></div>
-
             <div id="controls-area" class="hidden">
                 <div id="bid-panel">
                     <div id="current-bid-display"></div>
@@ -65,8 +54,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Game Over Screen -->
+            <!-- NEW: Game Over Screen -->
             <div id="game-over-overlay" class="hidden">
                 <div class="game-over-box">
                     <h2>Game Over!</h2>
@@ -76,7 +64,6 @@
             </div>
         </div>
     </div>
-
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
