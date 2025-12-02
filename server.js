@@ -131,7 +131,7 @@ io.on('connection', (socket) => {
             if (p.diceCount === 0) {
                 winner = p;
                 p.hasWon = true;
-                break; // We have a winner!
+                //break; // We have a winner!
             }
         }
         const countNotWon = r.players.filter(p => !p.hasWon).length;
