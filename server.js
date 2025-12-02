@@ -134,12 +134,12 @@ io.on('connection', (socket) => {
                 //break; // We have a winner!
             }
         }
-        const countNotWon = r.players.filter(p => !p.hasWon).length;
+        const stillInTheGameCount = r.players.filter(p => !p.hasWon).length;
         //if (winner) {
             // Game Over
-        if(countNotWon == 1){
-            let playerNotWon = r.players.find(p => !p.hasWon)
-            io.to(roomName).emit('gameOver', { winner: playerNotWon.username });
+        if(stillInTheGameCount == 1){ //last one standing
+            let stillInTheGame = r.players.find(p => !p.hasWon)
+            io.to(roomName).emit('gameOver', { loser: stillInTheGame.username });
             resetRoom(r);
             setTimeout(() => io.to(roomName).emit('roomUpdate', r), NEXT_ROUND_DELAY);
         } else {
