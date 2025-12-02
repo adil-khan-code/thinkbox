@@ -14,7 +14,7 @@ function resetRoom(room) {
     room.gameActive = false;
     room.currentBid = null;
     room.players.forEach(p => {
-        p.diceCount = 5; // Reset dice for a new game
+        p.diceCount = 4; // Reset dice for a new game
         p.isReady = false;
         p.dice = [];
     });
