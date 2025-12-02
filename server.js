@@ -7,7 +7,7 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = {};
-const NEXT_ROUND_DELAY = 7000; // 7 seconds to read the complex result
+const NEXT_ROUND_DELAY = 10000; // 7 seconds to read the complex result
 
 function resetRoom(room) {
     room.gameInProgress = false;
@@ -134,12 +134,12 @@ io.on('connection', (socket) => {
                 //break; // We have a winner!
             }
         }
-        const stillInTheGameCount = r.players.filter(p => !p.hasWon).length;
+        const playersStillIn  = r.players.filter(p => !p.hasWon);
         //if (winner) {
             // Game Over
-        if(stillInTheGameCount == 1){ //last one standing
-            let stillInTheGame = r.players.find(p => !p.hasWon)
-            io.to(roomName).emit('gameOver', { loser: stillInTheGame.username });
+        if(playersStillIn.length == 1){ //last one standing
+            const loser = playersStillIn[0];
+            io.to(roomName).emit('gameOver', { loser: loser.username });
             resetRoom(r);
             setTimeout(() => io.to(roomName).emit('roomUpdate', r), NEXT_ROUND_DELAY);
         } else {
