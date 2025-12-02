@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
         if (!rooms[room]) {
             rooms[room] = { players: [], currentTurnIndex: 0, currentBid: null, gameActive: false, gameInProgress: false };
         }
-        const newPlayer = { id: socket.id, username, dice: [], diceCount: asSpectator ? 0 : 4, isReady: false, hasWon = false, isSpectator: asSpectator};
+        const newPlayer = { id: socket.id, username, dice: [], diceCount: asSpectator ? 0 : 4, isReady: false, hasWon = false, isSpectator = asSpectator};
         rooms[room].players.push(newPlayer);
         io.to(room).emit('roomUpdate', rooms[room]);
     });
