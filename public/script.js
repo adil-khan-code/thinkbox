@@ -32,11 +32,13 @@ socket.on('notification', (msg) => { notify(msg); });
 function joinGame() {
     myUsername = document.getElementById('username').value;
     myRoom = document.getElementById('roomName').value;
+    const isSpectator = document.getElementById('spectatorCheckbox').checked;
+    
     if(!myUsername || !myRoom) return alert("Please fill in both fields");
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('game-container').classList.remove('hidden');
     document.getElementById('dispRoom').innerText = myRoom;
-    socket.emit('joinRoom', { username: myUsername, room: myRoom });
+    socket.emit('joinRoom', { username: myUsername, room: myRoom, isSpectator });
 }
 
 function closeGameOver() {
