@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
         if (!rooms[room]) {
             rooms[room] = { players: [], currentTurnIndex: 0, currentBid: null, gameActive: false, gameInProgress: false };
         }
-        const newPlayer = { id: socket.id, username, dice: [], diceCount: 4, isReady: false };
+        const newPlayer = { id: socket.id, username, dice: [], diceCount: asSpectator ? 0 : 4, isReady: false, hasWon = false, isSpectator: asSpectator};
         rooms[room].players.push(newPlayer);
         io.to(room).emit('roomUpdate', rooms[room]);
     });
@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
         const player = room.players.find(p => p.id === socket.id);
         if (player) player.isReady = true;
 
-        const allReady = room.players.every(p => p.isReady);
+        const allReady = room.players.filter(p => !p.isSpectator).every(p => p.isReady);
         if (room.players.length > 1 && allReady) {
             room.gameInProgress = true;
             startGameLogic(room, roomName);
