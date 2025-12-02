@@ -23,7 +23,7 @@ socket.on('roundOver', (data) => {
     drawGame();
 });
 socket.on('gameOver', (data) => {
-    document.getElementById('winner-text').innerText = `${data.winner} is the winner!`;
+    document.getElementById('winner-text').innerText = `${data.winner} is the loser!`;
     document.getElementById('game-over-overlay').classList.remove('hidden');
 });
 socket.on('notification', (msg) => { notify(msg); });
