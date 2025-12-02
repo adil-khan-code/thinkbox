@@ -7,7 +7,7 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = {};
-const NEXT_ROUND_DELAY = 5000; // 5 seconds to read the complex result
+const NEXT_ROUND_DELAY = 7000; // 7 seconds to read the complex result
 
 function resetRoom(room) {
     room.gameInProgress = false;
@@ -17,6 +17,7 @@ function resetRoom(room) {
         p.diceCount = 4; // Reset dice for a new game
         p.isReady = false;
         p.dice = [];
+        p.hasWon = false;
     });
 }
 
@@ -129,13 +130,16 @@ io.on('connection', (socket) => {
         for (const p of roundLosers) {
             if (p.diceCount === 0) {
                 winner = p;
+                p.hasWon = true;
                 break; // We have a winner!
             }
         }
-        
-        if (winner) {
+        const countNotWon = r.players.filter(p => !p.hasWon).length;
+        //if (winner) {
             // Game Over
-            io.to(roomName).emit('gameOver', { winner: winner.username });
+        if(countNotWon = 1){
+            let playerNotWon = r.players.find(p => !p.hasWon)
+            io.to(roomName).emit('gameOver', { winner: playerNotWon.username });
             resetRoom(r);
             setTimeout(() => io.to(roomName).emit('roomUpdate', r), NEXT_ROUND_DELAY);
         } else {
