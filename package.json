@@ -1,7 +1,7 @@
 {
-  "name": "snyd-game",
+  "name": "thinkbox-game",
   "version": "1.0.0",
-  "description": "Snyd Game",
+  "description": "Thinkbox Game",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
