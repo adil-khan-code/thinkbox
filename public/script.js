@@ -269,7 +269,7 @@ function drawPlayer(player, x, y, isTurn) {
     } else if (player.diceCount <= 0 && gameState.gameInProgress) {
         ctx.fillStyle = "#ff3b30";
         ctx.font = "bold 12px Arial";
-        ctx.fillText("ELIMINATED", x, y);
+        ctx.fillText("WON", x, y);
     }
 }
 
