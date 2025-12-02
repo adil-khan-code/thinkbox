@@ -143,6 +143,11 @@ function updateUI() {
         const readyCount = gameState.players.filter(p => p.isReady).length;
         document.getElementById('ready-status-text').innerText = `${readyCount} / ${gameState.players.length} Players Ready`;
         const myPlayer = gameState.players.find(p => p.id === myId);
+        if(myPlayer && myPlayer.isSpectator) {
+        document.getElementById('controls-area').classList.add('hidden');
+        document.getElementById('ready-area').classList.add('hidden');
+        document.getElementById('turn-bar').innerText = "Spectating...";
+    }
         const readyBtn = document.getElementById('btn-ready');
         readyBtn.disabled = myPlayer && myPlayer.isReady;
         readyBtn.innerText = (myPlayer && myPlayer.isReady) ? "Waiting for Others..." : "I'M READY";
