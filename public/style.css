@@ -69,4 +69,4 @@ canvas { background-color: #27ae60; border-radius: 20px; border: 12px solid #5d4
     text-align: center; box-shadow: 0 10px 40px black;
 }
 .game-over-box h2 { margin-top: 0; }
-#winner-text { font-size: 24px; margin: 20px 0; font-weight: bold; color: #34c759; }
+#winner-text { font-size: 24px; margin: 20px 0; font-weight: bold; color: #ff3b30; }
