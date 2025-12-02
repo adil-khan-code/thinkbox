@@ -22,8 +22,8 @@ socket.on('roundOver', (data) => {
     updateUI();
     drawGame();
 });
-socket.on('gameOver', (data) => {
-    document.getElementById('winner-text').innerText = `${data.winner} is the loser!`;
+socket.on('gameOver', (username) => {
+    document.getElementById('winner-text').innerText = `${username} is the loser!`;
     document.getElementById('game-over-overlay').classList.remove('hidden');
 });
 socket.on('notification', (msg) => { notify(msg); });
@@ -52,7 +52,7 @@ function callLiar() { socket.emit('callLiar', myRoom); }
 function notify(msg) {
     const el = document.getElementById('notification-area');
     el.innerText = msg;
-    if(msg) setTimeout(() => { el.innerText = ""; }, 3800); // Clear before next round starts
+    if(msg) setTimeout(() => { el.innerText = ""; }, 6000); // Clear before next round starts
 }
 
 function initBidControls() {
