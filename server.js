@@ -137,7 +137,7 @@ io.on('connection', (socket) => {
         const countNotWon = r.players.filter(p => !p.hasWon).length;
         //if (winner) {
             // Game Over
-        if(countNotWon = 1){
+        if(countNotWon == 1){
             let playerNotWon = r.players.find(p => !p.hasWon)
             io.to(roomName).emit('gameOver', { winner: playerNotWon.username });
             resetRoom(r);
