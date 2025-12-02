@@ -22,7 +22,7 @@ function resetRoom(room) {
 }
 
 io.on('connection', (socket) => {
-    socket.on('joinRoom', ({ username, room }) => {
+    socket.on('joinRoom', ({ username, room, asSpectator }) => {
         socket.join(room);
         if (!rooms[room]) {
             rooms[room] = { players: [], currentTurnIndex: 0, currentBid: null, gameActive: false, gameInProgress: false };
