@@ -7,7 +7,7 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = {};
-const NEXT_ROUND_DELAY = 10000; // 7 seconds to read the complex result
+const NEXT_ROUND_DELAY = 8000; // 7 seconds to read the complex result
 
 function resetRoom(room) {
     room.gameInProgress = false;
