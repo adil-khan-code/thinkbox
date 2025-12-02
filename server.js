@@ -103,13 +103,13 @@ io.on('connection', (socket) => {
             // The challenger is the only one who doesn't lose a die.
             safePlayerId = challenger.id;
             nextTurnPlayerIndex = challengerIndex;
-            message = `${bidder.username}'s bid was TRUE! Everyone except ${challenger.username} loses a die!`;
+            message = `${bidder.username}'s bid was TRUE! Everyone except ${challenger.username} WINS the round and loses a die!`;
         } else {
             // The bid was FALSE. The challenger was RIGHT.
             // The bidder (the liar) is the only one who doesn't lose a die.
             safePlayerId = bidder.id;
             nextTurnPlayerIndex = bidderIndex;
-            message = `${bidder.username} was LYING! Everyone except ${bidder.username} loses a die!`;
+            message = `${bidder.username} was LYING! Everyone except ${bidder.username} WINS the round and loses a die!`;
         }
 
         // Apply penalty to everyone except the safe player
