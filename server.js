@@ -138,8 +138,8 @@ io.on('connection', (socket) => {
         //if (winner) {
             // Game Over
         if(playersStillIn.length == 1){ //last one standing
-            const loser = playersStillIn[0];
-            io.to(roomName).emit('gameOver', { loser: loser.username });
+            let loser = playersStillIn[0];
+            io.to(roomName).emit('gameOver', loser.username);
             resetRoom(r);
             setTimeout(() => io.to(roomName).emit('roomUpdate', r), NEXT_ROUND_DELAY);
         } else {
