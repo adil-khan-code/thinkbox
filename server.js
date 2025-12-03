@@ -40,7 +40,7 @@ function roundOver(room) {
         // Send an updated public room snapshot after a short delay so clients move back to lobby
         setTimeout(() => {
             io.to(room.name).emit('roomUpdate', {
-                room,
+                room: room,
                 players: room.players.filter(p => !p.isSpectator)
             });
         }, NEXT_ROUND_DELAY);
@@ -109,7 +109,7 @@ io.on('connection', (socket) => {
             startGameLogic(room, roomName);
         } else {
             io.to(roomName).emit('roomUpdate', {
-                room,
+                room: room,
                 players: nonSpectators
             });
         }
@@ -228,7 +228,7 @@ io.on('connection', (socket) => {
             if (idx !== -1) {
                 room.players.splice(idx, 1);
                 io.to(roomName).emit('roomUpdate', {
-                    room,
+                    room: room,
                     players: room.players.filter(p => !p.isSpectator)
                 });
             }
