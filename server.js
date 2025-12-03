@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
         console.log(`Room ${roomName}: ${nonSpectators.length} players, allReady=${allReady}`);
         nonSpectators.forEach(p => console.log(`${p.username}: ${p.isReady}`));
     
-        if (allReady && nonSpectators.length > 0) {
+        if (allReady && room.players.length > 1) {
             room.gameInProgress = true;
             startGameLogic(room, roomName);
         } else {
