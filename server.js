@@ -29,7 +29,9 @@ io.on('connection', (socket) => {
         }
         const newPlayer = { id: socket.id, username, dice: [], diceCount: isSpectator ? 0 : 4, isReady: false, hasWon: false, isSpectator: isSpectator};
         rooms[room].players.push(newPlayer);
-        io.to(room).emit('roomUpdate', rooms[room]);
+        const publicPlayers = room.players.filter(p => !p.isSpectator);
+        io.to(room).emit('roomUpdate', {
+            rooms[room], players: publicPlayers});
     });
 
     socket.on('playerReady', (roomName) => {
@@ -43,7 +45,9 @@ io.on('connection', (socket) => {
             room.gameInProgress = true;
             startGameLogic(room, roomName);
         } else {
-            io.to(roomName).emit('roomUpdate', room);
+            const publicPlayers = room.players.filter(p => !p.isSpectator);
+            io.to(roomName).emit('roomUpdate', {
+                room, players: publicPlayers});
         }
     });
 
@@ -75,7 +79,8 @@ io.on('connection', (socket) => {
         do {
             r.currentTurnIndex = (r.currentTurnIndex + 1) % r.players.length;
         } while (r.players[r.currentTurnIndex].diceCount === 0);
-        io.to(room).emit('roomUpdate', r);
+        const publicPlayers = room.players.filter(p => !p.isSpectator);
+        io.to(room).emit('roomUpdate', {r, players: publicPlayers});
     });
 
     socket.on('callLiar', (roomName) => {
