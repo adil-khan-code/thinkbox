@@ -87,24 +87,28 @@ io.on('connection', (socket) => {
     });
 
     socket.on('playerReady', (roomName) => {
-        const room = rooms[roomName];
-        if (!room) return;
+    const room = rooms[roomName];
+    if (!room) return;
 
-        const player = room.players.find(p => p.id === socket.id);
-        if (player) player.isReady = true;
+    const player = room.players.find(p => p.id === socket.id);
+    if (player) player.isReady = true;
 
-        const allReady = room.players.filter(p => !p.isSpectator).every(p => p.isReady);
+    // Compute non-spectator players only
+    const nonSpectators = room.players.filter(p => !p.isSpectator);
+    const allReady = nonSpectators.length > 0 && nonSpectators.every(p => p.isReady);
 
-        if (room.players.filter(p => !p.isSpectator).length > 1 && allReady) {
-            room.gameInProgress = true;
-            startGameLogic(room, roomName);
-        } else {
-            io.to(roomName).emit('roomUpdate', {
-                room,
-                players: room.players.filter(p => !p.isSpectator)
-            });
-        }
-    });
+    // Start only if there are at least 2 non-spectator players and all of them are ready
+    if (nonSpectators.length > 1 && allReady) {
+        room.gameInProgress = true;
+        startGameLogic(room, roomName);
+    } else {
+        // send public snapshot (no spectators)
+        io.to(roomName).emit('roomUpdate', {
+            room,
+            players: nonSpectators
+        });
+    }
+});
 
     function startGameLogic(room, roomName) {
         room.gameActive = true;
