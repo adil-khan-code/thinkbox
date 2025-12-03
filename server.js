@@ -75,7 +75,7 @@ io.on('connection', (socket) => {
             diceCount: isSpectator ? 0 : 4,
             isReady: false,
             hasWon: false,
-            isSpectator: !!isSpectator
+            isSpectator: isSpectator
         };
 
         rooms[room].players.push(newPlayer);
