@@ -168,8 +168,13 @@ function updateUI() {
         document.getElementById('turn-bar').innerText = "Spectating...";
     }
         const readyBtn = document.getElementById('btn-ready');
-        readyBtn.disabled = myPlayer && myPlayer.isReady;
-        readyBtn.innerText = (myPlayer && myPlayer.isReady) ? "Waiting for Others..." : "I'M READY";
+        if(myPlayer?.isSpectator) {
+    readyBtn.style.display = 'none';  // hide ready button for spectators
+} else {
+    readyBtn.style.display = 'inline-block';
+    readyBtn.disabled = myPlayer.isReady;
+    readyBtn.innerText = myPlayer.isReady ? "Waiting for Others..." : "I'M READY";
+}
     } else { // GAME IS IN PROGRESS
         readyArea.classList.add('hidden');
         const activePlayer = gameState.players[gameState.currentTurnIndex];
