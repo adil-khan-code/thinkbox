@@ -9,6 +9,33 @@ app.use(express.static(path.join(__dirname, 'public')));
 const rooms = {};
 const NEXT_ROUND_DELAY = 8000; // 7 seconds to read the complex result
 
+function roundOver() {
+    const activePlayers = gameState.players.filter(
+        p => !p.isSpectator && !p.hasWon
+    );
+
+    if (activePlayers.length === 1) {
+        const loser = activePlayers[0];
+        gameState.loser = loser.username;
+
+        loser.hasWon = false;
+
+        gameState.currentTurnIndex = 0;
+        gameState.lastCall = null;
+        gameState.diceRolledCount = 0;
+
+        gameState.players.forEach(p => {
+            if (!p.isSpectator) {
+                p.dice = rollDice(p.diceCount);
+            }
+        });
+
+        return true;
+    }
+
+    return false;
+}
+
 function resetRoom(room) {
     room.gameInProgress = false;
     room.gameActive = false;
