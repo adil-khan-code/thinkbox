@@ -17,7 +17,7 @@ function resetRoom(room) {
     room.currentTurnIndex = 0;
     room.players.forEach(p => {
         p.diceCount = p.isSpectator ? 0 : 4;
-        p.isReady = false;
+        //p.isReady = false;
         p.dice = [];
         p.hasWon = false;
     });
