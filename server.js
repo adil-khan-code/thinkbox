@@ -141,7 +141,7 @@ io.on('connection', (socket) => {
         }
 
         io.to(roomName).emit('gameStarted', {
-            room,
+            room: room,
             players: room.players.filter(p => !p.isSpectator)
         });
     }
