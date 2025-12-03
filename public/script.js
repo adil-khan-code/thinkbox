@@ -12,7 +12,13 @@ let localFace = 2;
 
 // --- SOCKET LISTENERS ---
 socket.on('connect', () => { myId = socket.id; });
-socket.on('roomUpdate', (room) => { gameState = room; updateUI(); drawGame(); });
+socket.on('roomUpdate', ({ room, players }) => {
+    // Merge the players array back into room object
+    room.players = players; // ensures UI sees correct players list
+    gameState = room;
+    updateUI();
+    drawGame();
+});
 socket.on('gameStarted', (room) => { gameState = room; notify(""); updateUI(); drawGame(); });
 socket.on('roundOver', (data) => {
     gameState.players = data.allPlayers; 
