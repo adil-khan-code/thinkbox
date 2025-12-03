@@ -46,6 +46,19 @@ function closeGameOver() {
     // The server will automatically send a roomUpdate to reset to the lobby
 }
 
+function animateDiceLoss(playerPosition, faceValue) {
+    const anim = document.createElement("div");
+    anim.className = "dice-pop-anim";
+    anim.innerText = faceValue;
+
+    anim.style.left = playerPosition.x + "px";
+    anim.style.top = playerPosition.y + "px";
+
+    document.getElementById("ui-layer").appendChild(anim);
+
+    setTimeout(() => anim.remove(), 600);
+}
+
 function toggleReady() { socket.emit('playerReady', myRoom); }
 function submitBid() { socket.emit('placeBid', { room: myRoom, quantity: localQty, face: localFace }); }
 function callLiar() { socket.emit('callLiar', myRoom); }
