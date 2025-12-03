@@ -109,7 +109,7 @@ canvas { width: 1040px; height: 780px; background-color: #27ae60; border-radius:
 }
 
 .spectator-option {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     margin-top: 15px;
