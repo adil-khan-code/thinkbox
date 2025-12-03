@@ -22,12 +22,12 @@ function resetRoom(room) {
 }
 
 io.on('connection', (socket) => {
-    socket.on('joinRoom', ({ username, room, asSpectator }) => {
+    socket.on('joinRoom', ({ username, room, isSpectator }) => {
         socket.join(room);
         if (!rooms[room]) {
             rooms[room] = { players: [], currentTurnIndex: 0, currentBid: null, gameActive: false, gameInProgress: false };
         }
-        const newPlayer = { id: socket.id, username, dice: [], diceCount: asSpectator ? 0 : 4, isReady: false, hasWon: false, isSpectator: asSpectator};
+        const newPlayer = { id: socket.id, username, dice: [], diceCount: isSpectator ? 0 : 4, isReady: false, hasWon: false, isSpectator: isSpectator};
         rooms[room].players.push(newPlayer);
         io.to(room).emit('roomUpdate', rooms[room]);
     });
