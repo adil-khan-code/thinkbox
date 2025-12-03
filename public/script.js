@@ -131,7 +131,7 @@ function updateUI() {
     if (!gameState) return;
     const readyArea = document.getElementById('ready-area');
     const controls = document.getElementById('controls-area');
-    const liarBtn = document.getElementById('btnLiar');
+    const liarBtn = document.getElementById('btn-liar');
     const turnBar = document.getElementById('turn-bar');
     
     // LOBBY PHASE (Game hasn't started at all yet)
