@@ -218,12 +218,24 @@ function drawGame() {
     }
 
     // Players
-    gameState.players.forEach((player, i) => {
+    /*gameState.players.forEach((player, i) => {
+        if (player.isSpectator) return;
         const angle = (Math.PI * 2 / gameState.players.length) * i;
         const px = cx + Math.cos(angle) * tableRadius;
         const py = cy + Math.sin(angle) * tableRadius;
         drawPlayer(player, px, py, i === gameState.currentTurnIndex);
-    });
+    });*/
+
+    const visiblePlayers = gameState.players.filter(p => !p.isSpectator);
+    visiblePlayers.forEach((player, i) => {
+    const angle = (Math.PI * 2 / visiblePlayers.length) * i;
+    const px = cx + Math.cos(angle) * tableRadius;
+    const py = cy + Math.sin(angle) * tableRadius;
+
+    const isTurn = (player.id === visiblePlayers[gameState.currentTurnIndex]?.id);
+
+    drawPlayer(player, px, py, isTurn);
+});
 }
 
 function drawPlayer(player, x, y, isTurn) {
