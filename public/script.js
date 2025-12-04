@@ -12,13 +12,7 @@ let localFace = 2;
 
 // --- SOCKET LISTENERS ---
 socket.on('connect', () => { myId = socket.id; });
-socket.on('roomUpdate', ({ room, players }) => {
-    // Merge the players array back into room object
-    room.players = players; // ensures UI sees correct players list
-    gameState = room;
-    updateUI();
-    drawGame();
-});
+socket.on('roomUpdate', (room) => { gameState = room; updateUI(); drawGame(); });
 socket.on('gameStarted', (room) => { gameState = room; notify(""); updateUI(); drawGame(); });
 socket.on('roundOver', (data) => {
     gameState.players = data.allPlayers; 
@@ -50,19 +44,6 @@ function joinGame() {
 function closeGameOver() {
     document.getElementById('game-over-overlay').classList.add('hidden');
     // The server will automatically send a roomUpdate to reset to the lobby
-}
-
-function animateDiceLoss(playerPosition, faceValue) {
-    const anim = document.createElement("div");
-    anim.className = "dice-pop-anim";
-    anim.innerText = faceValue;
-
-    anim.style.left = playerPosition.x + "px";
-    anim.style.top = playerPosition.y + "px";
-
-    document.getElementById("ui-layer").appendChild(anim);
-
-    setTimeout(() => anim.remove(), 600);
 }
 
 function toggleReady() { socket.emit('playerReady', myRoom); }
@@ -150,7 +131,7 @@ function updateUI() {
     if (!gameState) return;
     const readyArea = document.getElementById('ready-area');
     const controls = document.getElementById('controls-area');
-    const liarBtn = document.getElementById('btn-liar');
+    const liarBtn = document.getElementById('btnLiar');
     const turnBar = document.getElementById('turn-bar');
     
     // LOBBY PHASE (Game hasn't started at all yet)
@@ -168,13 +149,8 @@ function updateUI() {
         document.getElementById('turn-bar').innerText = "Spectating...";
     }
         const readyBtn = document.getElementById('btn-ready');
-        if(myPlayer?.isSpectator) {
-    readyBtn.style.display = 'none';  // hide ready button for spectators
-} else {
-    readyBtn.style.display = 'inline-block';
-    readyBtn.disabled = myPlayer.isReady;
-    readyBtn.innerText = myPlayer.isReady ? "Waiting for Others..." : "I'M READY";
-}
+        readyBtn.disabled = myPlayer && myPlayer.isReady;
+        readyBtn.innerText = (myPlayer && myPlayer.isReady) ? "Waiting for Others..." : "I'M READY";
     } else { // GAME IS IN PROGRESS
         readyArea.classList.add('hidden');
         const activePlayer = gameState.players[gameState.currentTurnIndex];
@@ -242,24 +218,12 @@ function drawGame() {
     }
 
     // Players
-    /*gameState.players.forEach((player, i) => {
-        if (player.isSpectator) return;
+    gameState.players.forEach((player, i) => {
         const angle = (Math.PI * 2 / gameState.players.length) * i;
         const px = cx + Math.cos(angle) * tableRadius;
         const py = cy + Math.sin(angle) * tableRadius;
         drawPlayer(player, px, py, i === gameState.currentTurnIndex);
-    });*/
-
-    const visiblePlayers = gameState.players.filter(p => !p.isSpectator);
-    visiblePlayers.forEach((player, i) => {
-    const angle = (Math.PI * 2 / visiblePlayers.length) * i;
-    const px = cx + Math.cos(angle) * tableRadius;
-    const py = cy + Math.sin(angle) * tableRadius;
-
-    const isTurn = (player.id === visiblePlayers[gameState.currentTurnIndex]?.id);
-
-    drawPlayer(player, px, py, isTurn);
-});
+    });
 }
 
 function drawPlayer(player, x, y, isTurn) {
